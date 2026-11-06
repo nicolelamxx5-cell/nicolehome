@@ -108,7 +108,7 @@ create table public.suppliers (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-create unique index suppliers_name_idx on public.suppliers(household_id, lower(name));
+create unique index suppliers_name_idx on public.suppliers(household_id, name);
 
 -- ---------------------------------------------------------------------------
 -- Required items (purchasing needs) and product options (candidates)

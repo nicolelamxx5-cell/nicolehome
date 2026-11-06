@@ -31,14 +31,14 @@ export const ITEM_FIELD_KEYS: (keyof ItemFields)[] = [
   "dimensions_finish", "notes",
 ];
 
-export interface ExistingItem extends Partial<ItemFields> {
+export type ExistingItem = { [K in keyof ItemFields]?: ItemFields[K] | null } & {
   id: string;
   legacy_id: string | null;
   room_id: string;
   needs_review?: boolean;
   review_note?: string | null;
   import_snapshot: Partial<ItemFields> | null;
-}
+};
 
 export interface ExistingState {
   rooms: { id: string; name: string }[];
