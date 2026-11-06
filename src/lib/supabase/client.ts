@@ -1,6 +1,7 @@
 "use client";
 import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "@/lib/database.types";
+import { AUTH_COOKIE, SUPABASE_VIA_APP } from "./cookie";
 
 let client: ReturnType<typeof createBrowserClient<Database>> | null = null;
 
@@ -8,8 +9,9 @@ let client: ReturnType<typeof createBrowserClient<Database>> | null = null;
 export function getBrowserClient() {
   if (!client) {
     client = createBrowserClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      SUPABASE_VIA_APP ? `${window.location.origin}/supabase` : process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookieOptions: AUTH_COOKIE },
     );
   }
   return client;

@@ -16,6 +16,13 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: { bodySizeLimit: "15mb" }, // workbook uploads for import
   },
+  // Optional: let browsers reach Supabase through this app at /supabase/* (used for
+  // previews where the database is only reachable from the server). Also an option
+  // if only one domain can be reached from a network. Off unless SUPABASE_PROXY_TARGET is set.
+  async rewrites() {
+    const target = process.env.SUPABASE_PROXY_TARGET;
+    return target ? [{ source: "/supabase/:path*", destination: `${target.replace(/\/$/, "")}/:path*` }] : [];
+  },
   async headers() {
     return [
       {

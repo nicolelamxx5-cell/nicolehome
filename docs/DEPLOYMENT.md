@@ -105,3 +105,19 @@ npm run test:e2e
 `test:integration` and `test:e2e` **erase the local database**. They refuse to run against
 anything other than `localhost` / `127.0.0.1`. To include the real-workbook tests, set
 `WORKBOOK_PATH=/path/to/tracker.xlsm` (the workbook is never committed).
+
+## Previews: reaching Supabase through the app
+
+If the browser can't reach Supabase directly (for example a cloud preview where Supabase only runs
+on the server's `127.0.0.1`), build and start with:
+
+```bash
+NEXT_PUBLIC_SUPABASE_PROXY=1 SUPABASE_PROXY_TARGET=http://127.0.0.1:54321 npm run build
+```
+
+```bash
+NEXT_PUBLIC_SUPABASE_PROXY=1 SUPABASE_PROXY_TARGET=http://127.0.0.1:54321 npm start
+```
+
+Browser calls and photo links then go to `/supabase/*` on the app's own address, and Next.js
+forwards them. In production on Vercel, leave both unset.
