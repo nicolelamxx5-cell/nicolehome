@@ -36,11 +36,16 @@ export const getUser = cache(async () => {
 /** Signed-in user + household membership. Redirects to setup if not a member yet. */
 export const getContext = cache(async () => {
   const { supabase, userId, email } = await getUser();
-  const { data: member } = await supabase.from("household_members").select("*").eq("user_id", userId).maybeSingle();
+  // One parallel round trip: row-level security already limits both queries to
+  // the user's own household, so there is nothing to look up first.
+  const [{ data: members }, { data: households }] = await Promise.all([
+    supabase.from("household_members").select("*"),
+    supabase.from("households").select("*"),
+  ]);
+  const member = (members ?? []).find((m) => m.user_id === userId);
   if (!member) redirect("/setup");
-  const { data: household } = await supabase.from("households").select("*").eq("id", member.household_id).single();
+  const household = (households ?? []).find((h) => h.id === member.household_id);
   if (!household) redirect("/setup");
-  const { data: members } = await supabase.from("household_members").select("user_id, display_name, role").eq("household_id", household.id);
   const names = new Map((members ?? []).map((m) => [m.user_id, m.display_name || (m.role === "owner" ? "Owner" : "Member")]));
   return { supabase, userId, email, member, household, names };
 });
