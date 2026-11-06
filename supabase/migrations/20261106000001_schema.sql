@@ -116,7 +116,7 @@ create unique index suppliers_name_idx on public.suppliers(household_id, name);
 create table public.required_items (
   id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
-  room_id uuid not null references public.rooms(id) on delete restrict,
+  room_id uuid not null references public.rooms(id) on delete no action,
   budget_category_id uuid references public.budget_categories(id) on delete set null,
   legacy_id text,                       -- workbook ID, e.g. "03-005"
   name text not null check (length(name) between 1 and 200),
@@ -265,7 +265,7 @@ create table public.approvals (
   id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
   required_item_id uuid not null references public.required_items(id) on delete cascade,
-  option_id uuid not null references public.product_options(id) on delete restrict,
+  option_id uuid not null references public.product_options(id) on delete no action,
   status public.approval_status not null default 'active',
   approved_by uuid references auth.users(id) on delete set null,
   approved_at timestamptz not null default now(),
@@ -340,9 +340,9 @@ create index documents_option_idx on public.documents(option_id);
 create table public.payments (
   id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
-  required_item_id uuid references public.required_items(id) on delete restrict,
-  approval_id uuid references public.approvals(id) on delete restrict,
-  shared_cost_id uuid references public.shared_costs(id) on delete restrict,
+  required_item_id uuid references public.required_items(id) on delete no action,
+  approval_id uuid references public.approvals(id) on delete no action,
+  shared_cost_id uuid references public.shared_costs(id) on delete no action,
   supplier_id uuid references public.suppliers(id) on delete set null,
   kind public.payment_kind not null,
   amount numeric(14,2) not null check (amount > 0),      -- always positive; refunds are subtracted by kind
@@ -423,7 +423,7 @@ create table public.import_batches (
 
 create table public.audit_log (
   id bigint generated always as identity primary key,
-  household_id uuid references public.households(id) on delete cascade,
+  household_id uuid,                    -- not a foreign key: the audit trail outlives deleted records
   actor_id uuid,
   action text not null,
   entity text not null,

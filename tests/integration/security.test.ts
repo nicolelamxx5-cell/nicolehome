@@ -86,6 +86,14 @@ describe.skipIf(!enabled)("database security and workflow", () => {
     expect(allowance.error?.message).toMatch(/permission to change budgets/);
   });
 
+  it("the owner can set budgets and allowances", async () => {
+    const hhRes = await owner.from("households").update({ total_budget: 80000, contingency: 2000 }).eq("id", hh).select().single();
+    expect(hhRes.error).toBeNull();
+    expect(hhRes.data!.total_budget).toBe(80000);
+    expect((await owner.from("rooms").update({ budget: 12000 }).eq("id", room)).error).toBeNull();
+    expect((await owner.from("required_items").update({ estimate_unit: 2500 }).eq("id", item)).error).toBeNull();
+  });
+
   it("Keith cannot grant himself permissions", async () => {
     const res = await keith.from("household_members").update({ can_approve: true }).eq("user_id", keithId);
     expect(res.error?.message).toMatch(/Only the owner/);

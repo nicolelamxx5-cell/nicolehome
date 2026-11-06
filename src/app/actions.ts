@@ -23,7 +23,14 @@ const money = z.coerce.number().min(0).max(100_000_000);
 const currency = z.string().regex(/^[A-Z]{3}$/);
 
 function fail(e: unknown): ActionResult {
-  const msg = e instanceof z.ZodError ? e.issues[0].message : e instanceof Error ? e.message : String(e);
+  const msg =
+    e instanceof z.ZodError
+      ? e.issues[0].message
+      : e instanceof Error
+        ? e.message
+        : typeof e === "object" && e !== null && "message" in e
+          ? String((e as { message: unknown }).message) // Supabase/Postgres errors
+          : String(e);
   return { ok: false, error: msg };
 }
 

@@ -21,9 +21,10 @@ export async function resetAll(emails: string[]) {
   if (!/127\.0\.0\.1|localhost/.test(URL)) throw new Error("Refusing to reset a non-local database");
   const a = admin();
   // Order matters because approvals/payments restrict deletes; households cascade the rest.
-  await a.from("payments").delete().not("id", "is", null);
-  await a.from("approvals").delete().not("id", "is", null);
-  await a.from("households").delete().not("id", "is", null);
+  for (const t of ["payments", "approvals", "households"] as const) {
+    const { error } = await a.from(t).delete().not("id", "is", null);
+    if (error) throw new Error(`reset ${t}: ${error.message}`);
+  }
   await a.from("audit_log").delete().not("id", "is", null);
   const { data } = await a.auth.admin.listUsers({ perPage: 1000 });
   for (const u of data?.users ?? []) if (u.email && emails.includes(u.email)) await a.auth.admin.deleteUser(u.id);

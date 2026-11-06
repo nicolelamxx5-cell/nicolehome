@@ -216,7 +216,8 @@ begin
     changed := (tg_op = 'INSERT' and new.estimate_unit is not null)
             or (tg_op = 'UPDATE' and new.estimate_unit is distinct from old.estimate_unit);
   end if;
-  if changed and not public.has_perm(new.household_id, 'budget') then
+  -- households is keyed by id; every other table carries household_id
+  if changed and not public.has_perm(coalesce(public.try_uuid(to_jsonb(new) ->> 'household_id'), (to_jsonb(new) ->> 'id')::uuid), 'budget') then
     raise exception 'You do not have permission to change budgets or allowances';
   end if;
   return new;
