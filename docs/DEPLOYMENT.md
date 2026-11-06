@@ -23,6 +23,10 @@ recommended once real money is tracked here.
 
    This creates all tables, security rules (RLS), workflow functions and the private
    `household-files` storage bucket.
+
+   **No command line?** Instead, open `supabase/setup-all-in-one.sql`, copy all of it into
+   Supabase → **SQL Editor** → **New query**, and click **Run** (once, on a new project).
+   Regenerate that file with `npm run db:bundle` whenever the migrations change.
 3. **Authentication → Providers → Email**: keep Email enabled and turn **Confirm email** on.
 4. **Authentication → URL Configuration**: set *Site URL* to your app address (for example
    `https://home.example.com`) and add `https://home.example.com/auth/confirm` to the redirect URLs.

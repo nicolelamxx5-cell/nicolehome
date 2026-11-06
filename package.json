@@ -13,7 +13,8 @@
     "test:e2e": "playwright test --trace off",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
-    "db:types": "supabase gen types typescript --local > src/lib/database.types.ts"
+    "db:types": "supabase gen types typescript --local > src/lib/database.types.ts",
+    "db:bundle": "node scripts/bundle-sql.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.1.0",
