@@ -10,6 +10,7 @@ import { VoteBar, CheckRow, StatusSwitcher } from "@/components/option-widgets";
 import { Gallery } from "@/components/gallery";
 import { PhotoAdder } from "@/components/photo-adder";
 import { SuggestionPanel } from "@/components/suggestion-panel";
+import { Disclosure } from "@/components/disclosure";
 import { addComment, deleteComment, updateOption, updateWarranty, approveOption, addCheck, deleteOption } from "@/app/actions";
 import { PLATFORM_LABEL, PRICE_BASIS_LABEL, TRI_LABEL, VOTE_LABEL, CURRENCIES } from "@/lib/labels";
 import { readiness, READINESS_LABEL } from "@/lib/requirements";
@@ -132,6 +133,7 @@ export default async function OptionPage({ params }: { params: Promise<{ optionI
         </div>
       </div>
 
+      <div id="comments" />
       <SectionTitle>Comments</SectionTitle>
       <div className="card p-5">
         {(comments.data ?? []).length === 0 && <p className="text-[14px] text-muted">No comments yet.</p>}
@@ -181,8 +183,17 @@ export default async function OptionPage({ params }: { params: Promise<{ optionI
 
       {env.aiEnabled && <SuggestionPanel optionId={o.id} suggestions={(o.ai_suggestions ?? null) as never} hasPhotos={photos.length > 0} />}
 
-      <SectionTitle>Details</SectionTitle>
-      <div className="card p-5">
+      <Disclosure
+        className="card mt-10 p-5"
+        defaultOpen={o.price === null || !o.currency}
+        summary={
+          <>
+            <span className="font-display text-2xl">Details</span>
+            <span className="ml-2 text-[13px] text-muted">price, size, material, supplier</span>
+          </>
+        }
+      >
+        <div className="mt-4">
         <ActionForm action={updateOption.bind(null, o.id)} submitLabel="Save details">
           <div className="grid gap-4 sm:grid-cols-2">
             <F label="Product name" name="title" value={o.title} span />
@@ -246,10 +257,22 @@ export default async function OptionPage({ params }: { params: Promise<{ optionI
             </div>
           </div>
         </ActionForm>
-      </div>
+        </div>
+      </Disclosure>
 
-      <SectionTitle>Warranty</SectionTitle>
-      <div className="card p-5">
+      <Disclosure
+        className="card mt-4 p-5"
+        id="warranty"
+        summary={
+          <>
+            <span className="font-display text-2xl">Warranty</span>
+            <span className="ml-2 text-[13px] text-muted">
+              {o.warranty_provided === "unknown" ? "not recorded yet" : `${TRI_LABEL[o.warranty_provided]}${o.warranty_duration ? `, ${o.warranty_duration}` : ""} · Singapore: ${TRI_LABEL[o.warranty_valid_sg]}`}
+            </span>
+          </>
+        }
+      >
+        <div className="mt-4">
         {o.warranty_provided === "yes" && !o.warranty_verified && (
           <div className="mb-4">
             <Notice tone="warn">Warranty details are the supplier’s claim and have not been verified. A China warranty does not mean repairs are available in Singapore.</Notice>
@@ -274,9 +297,10 @@ export default async function OptionPage({ params }: { params: Promise<{ optionI
           </div>
         </ActionForm>
         <p className="mt-3 text-[12px] text-muted">
-          Provided: {TRI_LABEL[o.warranty_provided]} · Singapore: {TRI_LABEL[o.warranty_valid_sg]} · Upload the warranty card or receipt as a photo above.
+          Upload the warranty card or receipt as a photo above so it stays with this product.
         </p>
-      </div>
+        </div>
+      </Disclosure>
 
       <div className="mt-10 border-t hairline pt-6">
         <ActionButton action={deleteOption.bind(null, o.id)} className="btn btn-ghost btn-sm text-rose" confirm="Delete this option and its photos? This cannot be undone.">

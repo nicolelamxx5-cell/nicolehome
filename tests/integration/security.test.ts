@@ -165,6 +165,19 @@ describe.skipIf(!enabled)("database security and workflow", () => {
     await owner.from("household_members").update({ can_approve: false }).eq("user_id", keithId);
   });
 
+  it("re-sending a queued capture does not duplicate it", async () => {
+    const id = crypto.randomUUID();
+    const row = { id, household_id: hh, required_item_id: item, title: "Queued capture" };
+    for (let i = 0; i < 2; i++) {
+      expect((await keith.from("product_options").upsert(row, { onConflict: "id", ignoreDuplicates: true })).error).toBeNull();
+      expect(
+        (await keith.from("option_images").upsert({ household_id: hh, option_id: id, storage_path: `${hh}/options/${id}/d-0.jpg` }, { onConflict: "storage_path", ignoreDuplicates: true })).error,
+      ).toBeNull();
+    }
+    expect((await owner.from("product_options").select("id").eq("id", id)).data).toHaveLength(1);
+    expect((await owner.from("option_images").select("id").eq("option_id", id)).data).toHaveLength(1);
+  });
+
   it("uploaded files are private to the household", async () => {
     const path = `${hh}/options/${optA}/test.png`;
     const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);

@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 661C Home Hub
 
-## Getting Started
+A private, mobile-first renovation shopping and budget app for two homeowners renovating
+661C Edgedale Plains. Save products from Taobao, 1688, Xiaohongshu, showrooms and Singapore
+stores as screenshots or links, compare options room by room, approve one per item, and track
+forecast, commitments and payments separately.
 
-First, run the development server:
+* **How to use it:** [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
+* **Deploying (Supabase + Vercel):** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+* **China access & offline:** [docs/CHINA_ACCESS.md](docs/CHINA_ACCESS.md)
+* **Plan, data model, decisions:** [docs/PLAN.md](docs/PLAN.md)
+* **What's done and verified:** [docs/STATUS.md](docs/STATUS.md)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+Next.js 16 (App Router, TypeScript) · Tailwind CSS 4 · Supabase (Postgres, Auth, private Storage,
+row-level security) · Vercel · PWA (service worker, offline capture queue, Android share target).
+
+## Layout
+
+```
+supabase/migrations/   schema, RLS & storage policies, approval workflow functions
+src/lib/finance.ts     budget engine (exact cents) — the single source of every total
+src/lib/import/        workbook parser + planner (duplicate-safe) + apply
+src/lib/requirements.ts  purchase-check library and readiness rules
+src/app/actions.ts     all writes (server actions, as the signed-in user)
+src/app/(app)/         screens: Home, Shop, Add, Wishlist, Budget, More, Trip
+public/sw.js           offline pages/photos + share target
+tests/                 unit, integration (RLS against local Supabase), e2e (Playwright)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick start (local)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#local-development-and-tests).

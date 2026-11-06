@@ -164,7 +164,7 @@ export default async function ComparePage({ params }: { params: Promise<{ itemId
                   {cols.map((c) => (
                     <th key={c.o.id} className="p-4 text-left align-top font-normal">
                       <Link href={`/options/${c.o.id}`} className="block">
-                        <Thumb src={c.photo} alt={c.o.title} className="aspect-square w-full rounded-xl" />
+                        <Thumb src={c.photo} alt={c.o.title} className="aspect-[4/3] w-full rounded-xl" />
                         <div className="mt-3 font-medium leading-snug">{c.o.title}</div>
                       </Link>
                       <div className="mt-2">
